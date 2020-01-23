@@ -40,7 +40,7 @@ def calculate_hist(img, channel, histSize, ranges):
     #[0, 1, 2], None, [32, 32, 32], [1, 256, 1, 256, 1, 256]
     return hist
 
-def vergelijken(puzzelstuk, box):
+def vergelijken(puzzelstuk, box, stukken_vergelijken):
     if kleur:
         (winW, winH, _) = puzzelstuk.shape
     else:
@@ -62,7 +62,6 @@ def vergelijken(puzzelstuk, box):
         dict_difrance = {k: v for k, v in sorted(dict_difrance.items(), key=lambda item: item[1], reverse=True)}
         print("data verwerkt")
         print("img wegschrijven")
-        print(dict_difrance)
         eerste_items = dict(list(dict_difrance.items())[0:1])
         eerste_keys = list(eerste_items.keys())
         return (eerste_keys[0], dict_difrance[eerste_keys[0]])
@@ -103,10 +102,10 @@ def puzzelstuk(path, filename, box, stukken_vergelijken):
     if inzoemen:
         for scale in np.linspace(0.2, 1.0, 20)[::-1]:
             resized = imutils.resize(puzzelstuk, width=int(puzzelstuk.shape[1] * scale))
-            temp = vergelijken(resized, box)
+            temp = vergelijken(resized, box, stukken_vergelijken)
             dict_difrance[temp[0]] = temp[1]
     else:
-        temp = vergelijken(puzzelstuk, box)
+        temp = vergelijken(puzzelstuk, box, stukken_vergelijken)
         dict_difrance[temp[0]] = temp[1]
     dict_difrance = {k: v for k, v in sorted(dict_difrance.items(), key=lambda item: item[1], reverse=True)}
     eerste_items = dict(list(dict_difrance.items())[0:1])
@@ -131,11 +130,14 @@ parser.add_argument("--k", default='K', type=str, help="Puzzelstukken in kleur(K
 parser.add_argument("--z", default='N', type=str, help="Wil je dat grote van de stukjes niet verander(N) of dat hij verkleint en vergroot (Y)")
 parser.add_argument("--g", default='9', type=int, help="Aantal stuks: 9 of 50")
 parser.add_argument('--s', default='A', type=str, help="Wil je alle stuks (A) of 1 stuk (B)")
+parser.add_argument('--v', default='H', type=str, help="Manieren om puzzel stukken te vergelijken: histogram (H), machtTemplate (M), hoeken op puzzel vergelijken (C)")
+
 args = parser.parse_args()
 kleur = args.k
 inzoemen = args.z
 grote_puzzel = args.g
 aantal_stuks = args.s
+stukken_vergelijken = args.v
 # kleur = input("In kleur(K) of zwart-wit (G) : ")
 # inzoemen = input('Wil je dat grote van de stukjes niet verander(N) of dat hij verkleint en vergroot (Y) ')
 # grote_puzzel = int(input("Aantal stuks: 9 of 50: "))
